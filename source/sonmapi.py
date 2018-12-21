@@ -139,9 +139,9 @@ class SonmApi:
 
     def predict_bid(self, bid_):
         result = None
-        predict_ = self.predict_bid_rest(bid_)
-        if predict_ and "perSecond" in predict_:
-            result = {"perHourUSD": convert_price(predict_["perSecond"])}
+#        predict_ = self.predict_bid_rest(bid_)
+#        if predict_ and "perSecond" in predict_:
+#            result = {"perHourUSD": convert_price(predict_["perSecond"])}
         return result
 
     def token_balance(self):
