@@ -66,7 +66,8 @@ class SonmApi:
         return result
 
     def order_list(self, limit):
-        order_list_ = self.order_list_rest(limit)
+        #limit = 1000
+        order_list_ = self.order_list_rest(1000)
         orders_ = None
         if order_list_ and "orders" in order_list_ is not None:
             orders_ = [{"id": order["order"]["id"],
@@ -93,7 +94,8 @@ class SonmApi:
 
     def deal_list(self, limit):
         result = []
-        deal_list_ = self.deal_list_rest(limit)
+		#limit = 1000
+        deal_list_ = self.deal_list_rest(1000)
         if deal_list_ and "deals" in deal_list_:
             for d in [d_["deal"] for d_ in deal_list_['deals']]:
                 result.append({"id": d["id"]})
@@ -127,7 +129,7 @@ class SonmApi:
         task_status_ = self.task_status_rest(deal_id, task_id)
         if task_status_ and "status" in task_status_:
             result = {"status": task_status_["status"],
-                      "uptime": str(int(float(int(task_status_["uptime"]) / 1e9)))}
+                      "uptime": str(int(float(int(task_status_["uptime"]/60) / 1e9)))}
         return result
 
     def task_start(self, deal_id, task, timeout):
@@ -167,9 +169,10 @@ class SonmApi:
 
     @retry_on_status
     def deal_list_rest(self, limit):
+		#limit = 1000
         filters = {"status": 1,
                    "consumerID": self.get_node().eth_addr,
-                   "limit": limit}
+                   "limit": 1000}
         return self.get_node().deal.list(filters, timeout=self.timeout)
 
     @retry_on_status
@@ -182,7 +185,8 @@ class SonmApi:
 
     @retry_on_status
     def order_list_rest(self, limit):
-        return self.get_node().order.list(self.get_node().eth_addr, limit, timeout=self.timeout)
+		#limit = 1000
+        return self.get_node().order.list(self.get_node().eth_addr, 1000, timeout=self.timeout)
 
     @retry_on_status
     def order_status_rest(self, order_id):

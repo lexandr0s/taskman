@@ -4,6 +4,7 @@ import logging
 import os
 import platform
 import re
+import json
 from enum import Enum
 
 import ruamel.yaml
@@ -109,12 +110,31 @@ def validate_eth_addr(eth_addr):
 
 
 def print_state():
+	
     tabul_nodes = [[n.node_tag, n.bid_id, n.price, n.deal_id, n.task_id, n.task_uptime, n.status.name] for n in
                    Nodes.get_nodes_arr()]
+	
+    #log_str = [[n.node_tag, n.status.name] for n in
+    #               Nodes.get_nodes_arr()]
+    #with open('file.txt', 'w') as f:
+    #    json.dump(log_str, file=f)
+	#log_str = '{['
+    log_str = ''
+    for x in Nodes.get_nodes_arr():
+        log_str = log_str + x.node_tag + ' ' + x.status.name + '\n'
+
+	#log_str = log_str + "]
+    with open('conf/log.txt', 'w') as f:
+        print(log_str, file=f)
+	
     logger.info("Nodes:\n" +
                 tabulate(tabul_nodes,
                          ["Node", "Order id", "Order price", "Deal id", "Task id", "Task uptime", "Node status"],
                          tablefmt="grid"))
+	
+    
+    	
+    
 
 
 def template_bid(config, tag="", counterparty=None):

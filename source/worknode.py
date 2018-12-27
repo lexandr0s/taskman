@@ -185,7 +185,7 @@ class WorkNode:
             return 1
         time_ = task_status["uptime"]
         if task_status["status"] == TaskStatus.running.value:
-            self.logger.info("Task {} on deal {} (Node {}) is running. Uptime is {} seconds"
+            self.logger.info("Task {} on deal {} (Node {}) is running. Uptime is {} minutes"
                              .format(self.task_id, self.deal_id, self.node_tag, time_))
             self.task_uptime = time_
             return 60
@@ -208,7 +208,7 @@ class WorkNode:
                 self.status = State.TASK_BROKEN
                 return 1
         if task_status["status"] == TaskStatus.finished.value:
-            self.logger.info("Task {}  on deal {} (Node {} ) is finished. Uptime is {}  seconds"
+            self.logger.info("Task {}  on deal {} (Node {} ) is finished. Uptime is {}  minutes"
                              .format(self.task_id, self.deal_id, self.node_tag, time_))
             self.logger.info("Task {}  on deal {} (Node {} ) success. Fetching log, shutting down node..."
                              .format(self.task_id, self.deal_id, self.node_tag))
@@ -219,10 +219,14 @@ class WorkNode:
     def watch_node(self):
         self.RUNNING = True
         sleep_time = 1
+		
         while self.KEEP_WORK and self.status != State.WORK_COMPLETED:
-            if int(time.time() - self.last_heartbeat) > restart_timeout():
+            if int(time.time() - self.last_heartbeat) > 600:
                 self.reset_to_start()
-            if self.status == State.START or self.status == State.CREATE_ORDER:
+            if self.status == State.START:
+                self.create_order()
+                sleep_time = 300
+            elif self.status == State.CREATE_ORDER:
                 self.create_order()
                 sleep_time = 60
             elif self.status == State.AWAITING_DEAL:
@@ -245,7 +249,7 @@ class WorkNode:
                 self.close_deal(State.CREATE_ORDER)
                 sleep_time = 1
             elif self.status == State.TASK_FINISHED:
-                self.close_deal(State.WORK_COMPLETED)
+                self.close_deal(State.CREATE_ORDER)
                 sleep_time = 1
             self.wait_sleep(sleep_time)
             self.last_heartbeat = time.time()
